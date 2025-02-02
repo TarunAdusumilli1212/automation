@@ -64,12 +64,15 @@
             font-weight: bold;
         }
     </style>
+    <!-- Add Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 </head>
 <body>
 
     <header>
         <h1>VM Tracker</h1>
-        <p>By Automation Team</p>
+        <p>Track which team member is using which VM</p>
     </header>
 
     <div class="container">
@@ -91,12 +94,11 @@
 
             <label for="name">Select your name:</label>
             <select id="name" required>
-                <option value="Aruna">Aruna</option>
-                <option value="Dakshitha">Dakshitha</option>
-                <option value="Mani">Mani</option>
-                <option value="Renuka">Renuka</option>
-                <option value="Satya">Satya</option>
-                <option value="Tarun">Tarun</option>
+                <option value="John">John</option>
+                <option value="Jane">Jane</option>
+                <option value="Mike">Mike</option>
+                <option value="Emily">Emily</option>
+                <option value="Alice">Alice</option>
                 <!-- Add more team member names here -->
             </select>
 
@@ -111,8 +113,30 @@
     </div>
 
     <script>
-        // Initialize VM data with 10 VMs
-        let vmStatus = {
+        // Initialize Firebase
+        // const firebaseConfig = {
+        //     apiKey: "your-api-key",
+        //     authDomain: "your-auth-domain",
+        //     projectId: "your-project-id",
+        //     storageBucket: "your-storage-bucket",
+        //     messagingSenderId: "your-sender-id",
+        //     appId: "your-app-id"
+        // };
+        const firebaseConfig = {
+            apiKey: "AIzaSyD3IPcwDraVNpkyp3hsdOEaj9sppImKkww",
+            authDomain: "automation-4d6c3.firebaseapp.com",
+            projectId: "automation-4d6c3",
+            storageBucket: "automation-4d6c3.firebasestorage.app",
+            messagingSenderId: "1004472798000",
+            appId: "1:1004472798000:web:9e07bbdef81cb8414856f5",
+            measurementId: "G-P68MCKEZWP"
+            };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(app);
+
+        // Initialize VM data structure
+        const defaultVMStatus = {
             "VM1": { status: "Free", user: "" },
             "VM2": { status: "Free", user: "" },
             "VM3": { status: "Free", user: "" },
@@ -125,14 +149,27 @@
             "VM10": { status: "Free", user: "" }
         };
 
+        // Fetch the VM status from Firestore
+        async function fetchVMStatus() {
+            const vmData = await db.collection("vmStatus").get();
+            if (!vmData.empty) {
+                vmData.forEach(doc => {
+                    const vmName = doc.id;
+                    const vmInfo = doc.data();
+                    defaultVMStatus[vmName] = vmInfo;
+                });
+            }
+            updateVMList();
+        }
+
         // Generate VM list in the DOM
         function updateVMList() {
             const vmListContainer = document.querySelector('.vm-list');
             vmListContainer.innerHTML = ''; // Clear the current list
 
-            Object.keys(vmStatus).forEach(vm => {
+            Object.keys(defaultVMStatus).forEach(vm => {
                 const vmElement = document.createElement('div');
-                const vmData = vmStatus[vm];
+                const vmData = defaultVMStatus[vm];
 
                 vmElement.classList.add('vm-item');
                 if (vmData.status === "Free") {
@@ -152,7 +189,7 @@
         }
 
         // Handle VM form submission (Assign VM)
-        document.getElementById("vmForm").addEventListener("submit", function(e) {
+        document.getElementById("vmForm").addEventListener("submit", async function(e) {
             e.preventDefault();
 
             const selectedVM = document.getElementById("vm").value;
@@ -164,12 +201,13 @@
             }
 
             // Check if VM is free
-            if (vmStatus[selectedVM].status === "Free") {
+            if (defaultVMStatus[selectedVM].status === "Free") {
                 // Assign VM to the user
-                vmStatus[selectedVM] = { status: "In Use", user: selectedUser };
+                defaultVMStatus[selectedVM] = { status: "In Use", user: selectedUser };
+                await db.collection("vmStatus").doc(selectedVM).set({ status: "In Use", user: selectedUser });
                 alert(`${selectedUser} has successfully assigned ${selectedVM}`);
             } else {
-                alert(`${selectedVM} is already in use by ${vmStatus[selectedVM].user}.`);
+                alert(`${selectedVM} is already in use by ${defaultVMStatus[selectedVM].user}.`);
             }
 
             updateVMList();  // Update the UI after assignment
@@ -177,7 +215,7 @@
         });
 
         // Handle VM release
-        document.getElementById("releaseBtn").addEventListener("click", function() {
+        document.getElementById("releaseBtn").addEventListener("click", async function() {
             const selectedVM = document.getElementById("vm").value;
             const selectedUser = document.getElementById("name").value.trim();
 
@@ -186,9 +224,10 @@
                 return;
             }
 
-            if (vmStatus[selectedVM].status === "In Use" && vmStatus[selectedVM].user === selectedUser) {
+            if (defaultVMStatus[selectedVM].status === "In Use" && defaultVMStatus[selectedVM].user === selectedUser) {
                 // Release VM
-                vmStatus[selectedVM] = { status: "Free", user: "" };
+                defaultVMStatus[selectedVM] = { status: "Free", user: "" };
+                await db.collection("vmStatus").doc(selectedVM).set({ status: "Free", user: "" });
                 alert(`${selectedUser} has successfully released ${selectedVM}`);
             } else {
                 alert(`You cannot release ${selectedVM} because it is not assigned to you.`);
@@ -198,11 +237,9 @@
             document.getElementById("vmForm").reset(); // Reset the form
         });
 
-        // Initial VM list display
-        updateVMList();
-
+        // Fetch the initial VM status
+        fetchVMStatus();
     </script>
 
 </body>
 </html>
-
