@@ -73,7 +73,7 @@
     </header>
 
     <div class="container">
-        <h2>Assign a VM</h2>
+        <h2>Assign or Release a VM</h2>
         <form id="vmForm">
             <label for="vm">Select a VM:</label>
             <select id="vm" required>
@@ -82,45 +82,68 @@
                 <option value="VM3">VM3</option>
                 <option value="VM4">VM4</option>
                 <option value="VM5">VM5</option>
+                <option value="VM6">VM6</option>
+                <option value="VM7">VM7</option>
+                <option value="VM8">VM8</option>
+                <option value="VM9">VM9</option>
+                <option value="VM10">VM10</option>
             </select>
 
             <label for="name">Enter your name:</label>
             <input type="text" id="name" placeholder="Your Name" required>
 
             <button type="submit">Assign VM</button>
+            <button type="button" id="releaseBtn">Release VM</button>
         </form>
 
         <h2>VM Status</h2>
         <div class="vm-list">
-            <div class="vm-item free" data-vm="VM1">
-                <span class="vm-name">VM1</span>: <span class="status">Free</span>
-            </div>
-            <div class="vm-item free" data-vm="VM2">
-                <span class="vm-name">VM2</span>: <span class="status">Free</span>
-            </div>
-            <div class="vm-item free" data-vm="VM3">
-                <span class="vm-name">VM3</span>: <span class="status">Free</span>
-            </div>
-            <div class="vm-item free" data-vm="VM4">
-                <span class="vm-name">VM4</span>: <span class="status">Free</span>
-            </div>
-            <div class="vm-item free" data-vm="VM5">
-                <span class="vm-name">VM5</span>: <span class="status">Free</span>
-            </div>
+            <!-- VM items dynamically generated here -->
         </div>
     </div>
 
     <script>
-        // Example VM data (this could be loaded dynamically via an API)
+        // Initialize VM data with 10 VMs
         let vmStatus = {
             "VM1": { status: "Free", user: "" },
             "VM2": { status: "Free", user: "" },
             "VM3": { status: "Free", user: "" },
             "VM4": { status: "Free", user: "" },
-            "VM5": { status: "Free", user: "" }
+            "VM5": { status: "Free", user: "" },
+            "VM6": { status: "Free", user: "" },
+            "VM7": { status: "Free", user: "" },
+            "VM8": { status: "Free", user: "" },
+            "VM9": { status: "Free", user: "" },
+            "VM10": { status: "Free", user: "" }
         };
 
-        // Handle form submission
+        // Generate VM list in the DOM
+        function updateVMList() {
+            const vmListContainer = document.querySelector('.vm-list');
+            vmListContainer.innerHTML = ''; // Clear the current list
+
+            Object.keys(vmStatus).forEach(vm => {
+                const vmElement = document.createElement('div');
+                const vmData = vmStatus[vm];
+
+                vmElement.classList.add('vm-item');
+                if (vmData.status === "Free") {
+                    vmElement.classList.add('free');
+                } else {
+                    vmElement.classList.add('in-use');
+                }
+
+                vmElement.innerHTML = `
+                    <strong>${vm}</strong>: 
+                    <span class="status">${vmData.status}</span>
+                    ${vmData.status === 'In Use' ? `by <strong>${vmData.user}</strong>` : ''}
+                `;
+
+                vmListContainer.appendChild(vmElement);
+            });
+        }
+
+        // Handle VM form submission (Assign VM)
         document.getElementById("vmForm").addEventListener("submit", function(e) {
             e.preventDefault();
 
@@ -134,43 +157,42 @@
 
             // Check if VM is free
             if (vmStatus[selectedVM].status === "Free") {
-                // Assign VM
+                // Assign VM to the user
                 vmStatus[selectedVM] = { status: "In Use", user: userName };
-
-                // Update UI
-                updateVMList();
-
                 alert(`${userName} has successfully assigned ${selectedVM}`);
             } else {
                 alert(`${selectedVM} is already in use by ${vmStatus[selectedVM].user}.`);
             }
 
-            // Clear the form
-            document.getElementById("vmForm").reset();
+            updateVMList();  // Update the UI after assignment
+            document.getElementById("vmForm").reset(); // Reset the form
         });
 
-        // Update the VM list on the UI
-        function updateVMList() {
-            const vmItems = document.querySelectorAll('.vm-item');
-            vmItems.forEach(item => {
-                const vmName = item.getAttribute('data-vm');
-                const status = vmStatus[vmName];
+        // Handle VM release
+        document.getElementById("releaseBtn").addEventListener("click", function() {
+            const selectedVM = document.getElementById("vm").value;
+            const userName = document.getElementById("name").value.trim();
 
-                const statusElement = item.querySelector('.status');
-                const vmNameElement = item.querySelector('.vm-name');
+            if (userName === "") {
+                alert("Please enter your name!");
+                return;
+            }
 
-                statusElement.textContent = status.status;
-                if (status.status === "Free") {
-                    item.classList.remove('in-use');
-                    item.classList.add('free');
-                } else {
-                    item.classList.remove('free');
-                    item.classList.add('in-use');
-                }
+            if (vmStatus[selectedVM].status === "In Use" && vmStatus[selectedVM].user === userName) {
+                // Release VM
+                vmStatus[selectedVM] = { status: "Free", user: "" };
+                alert(`${userName} has successfully released ${selectedVM}`);
+            } else {
+                alert(`You cannot release ${selectedVM} because it is not assigned to you.`);
+            }
 
-                vmNameElement.textContent = vmName;
-            });
-        }
+            updateVMList();  // Update the UI after release
+            document.getElementById("vmForm").reset(); // Reset the form
+        });
+
+        // Initial VM list display
+        updateVMList();
+
     </script>
 
 </body>
