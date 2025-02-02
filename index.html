@@ -45,7 +45,7 @@
             margin-bottom: 10px;
             font-weight: bold;
         }
-        select, input[type="text"], button {
+        select, button {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -69,7 +69,7 @@
 
     <header>
         <h1>VM Tracker</h1>
-        <p>Track which team member is using which VM</p>
+        <p>By Automation Team</p>
     </header>
 
     <div class="container">
@@ -89,8 +89,16 @@
                 <option value="VM10">VM10</option>
             </select>
 
-            <label for="name">Enter your name:</label>
-            <input type="text" id="name" placeholder="Your Name" required>
+            <label for="name">Select your name:</label>
+            <select id="name" required>
+                <option value="Aruna">Aruna</option>
+                <option value="Dakshitha">Dakshitha</option>
+                <option value="Mani">Mani</option>
+                <option value="Renuka">Renuka</option>
+                <option value="Satya">Satya</option>
+                <option value="Tarun">Tarun</option>
+                <!-- Add more team member names here -->
+            </select>
 
             <button type="submit">Assign VM</button>
             <button type="button" id="releaseBtn">Release VM</button>
@@ -148,18 +156,18 @@
             e.preventDefault();
 
             const selectedVM = document.getElementById("vm").value;
-            const userName = document.getElementById("name").value.trim();
+            const selectedUser = document.getElementById("name").value.trim();
 
-            if (userName === "") {
-                alert("Please enter your name!");
+            if (selectedUser === "") {
+                alert("Please select your name!");
                 return;
             }
 
             // Check if VM is free
             if (vmStatus[selectedVM].status === "Free") {
                 // Assign VM to the user
-                vmStatus[selectedVM] = { status: "In Use", user: userName };
-                alert(`${userName} has successfully assigned ${selectedVM}`);
+                vmStatus[selectedVM] = { status: "In Use", user: selectedUser };
+                alert(`${selectedUser} has successfully assigned ${selectedVM}`);
             } else {
                 alert(`${selectedVM} is already in use by ${vmStatus[selectedVM].user}.`);
             }
@@ -171,17 +179,17 @@
         // Handle VM release
         document.getElementById("releaseBtn").addEventListener("click", function() {
             const selectedVM = document.getElementById("vm").value;
-            const userName = document.getElementById("name").value.trim();
+            const selectedUser = document.getElementById("name").value.trim();
 
-            if (userName === "") {
-                alert("Please enter your name!");
+            if (selectedUser === "") {
+                alert("Please select your name!");
                 return;
             }
 
-            if (vmStatus[selectedVM].status === "In Use" && vmStatus[selectedVM].user === userName) {
+            if (vmStatus[selectedVM].status === "In Use" && vmStatus[selectedVM].user === selectedUser) {
                 // Release VM
                 vmStatus[selectedVM] = { status: "Free", user: "" };
-                alert(`${userName} has successfully released ${selectedVM}`);
+                alert(`${selectedUser} has successfully released ${selectedVM}`);
             } else {
                 alert(`You cannot release ${selectedVM} because it is not assigned to you.`);
             }
@@ -197,3 +205,4 @@
 
 </body>
 </html>
+
