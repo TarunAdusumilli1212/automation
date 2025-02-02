@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VM Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+        }
+        .vm-list {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .vm-item {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e7e7e7;
+            border-radius: 5px;
+        }
+        .vm-item.free {
+            background-color: #c8e6c9;
+        }
+        .vm-item.in-use {
+            background-color: #ffccbc;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        select, input[type="text"], button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .status {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>VM Tracker</h1>
+        <p>Track which team member is using which VM</p>
+    </header>
+
+    <div class="container">
+        <h2>Assign a VM</h2>
+        <form id="vmForm">
+            <label for="vm">Select a VM:</label>
+            <select id="vm" required>
+                <option value="VM1">VM1</option>
+                <option value="VM2">VM2</option>
+                <option value="VM3">VM3</option>
+                <option value="VM4">VM4</option>
+                <option value="VM5">VM5</option>
+            </select>
+
+            <label for="name">Enter your name:</label>
+            <input type="text" id="name" placeholder="Your Name" required>
+
+            <button type="submit">Assign VM</button>
+        </form>
+
+        <h2>VM Status</h2>
+        <div class="vm-list">
+            <div class="vm-item free" data-vm="VM1">
+                <span class="vm-name">VM1</span>: <span class="status">Free</span>
+            </div>
+            <div class="vm-item free" data-vm="VM2">
+                <span class="vm-name">VM2</span>: <span class="status">Free</span>
+            </div>
+            <div class="vm-item free" data-vm="VM3">
+                <span class="vm-name">VM3</span>: <span class="status">Free</span>
+            </div>
+            <div class="vm-item free" data-vm="VM4">
+                <span class="vm-name">VM4</span>: <span class="status">Free</span>
+            </div>
+            <div class="vm-item free" data-vm="VM5">
+                <span class="vm-name">VM5</span>: <span class="status">Free</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Example VM data (this could be loaded dynamically via an API)
+        let vmStatus = {
+            "VM1": { status: "Free", user: "" },
+            "VM2": { status: "Free", user: "" },
+            "VM3": { status: "Free", user: "" },
+            "VM4": { status: "Free", user: "" },
+            "VM5": { status: "Free", user: "" }
+        };
+
+        // Handle form submission
+        document.getElementById("vmForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const selectedVM = document.getElementById("vm").value;
+            const userName = document.getElementById("name").value.trim();
+
+            if (userName === "") {
+                alert("Please enter your name!");
+                return;
+            }
+
+            // Check if VM is free
+            if (vmStatus[selectedVM].status === "Free") {
+                // Assign VM
+                vmStatus[selectedVM] = { status: "In Use", user: userName };
+
+                // Update UI
+                updateVMList();
+
+                alert(`${userName} has successfully assigned ${selectedVM}`);
+            } else {
+                alert(`${selectedVM} is already in use by ${vmStatus[selectedVM].user}.`);
+            }
+
+            // Clear the form
+            document.getElementById("vmForm").reset();
+        });
+
+        // Update the VM list on the UI
+        function updateVMList() {
+            const vmItems = document.querySelectorAll('.vm-item');
+            vmItems.forEach(item => {
+                const vmName = item.getAttribute('data-vm');
+                const status = vmStatus[vmName];
+
+                const statusElement = item.querySelector('.status');
+                const vmNameElement = item.querySelector('.vm-name');
+
+                statusElement.textContent = status.status;
+                if (status.status === "Free") {
+                    item.classList.remove('in-use');
+                    item.classList.add('free');
+                } else {
+                    item.classList.remove('free');
+                    item.classList.add('in-use');
+                }
+
+                vmNameElement.textContent = vmName;
+            });
+        }
+    </script>
+
+</body>
+</html>
