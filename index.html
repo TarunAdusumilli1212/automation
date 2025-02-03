@@ -64,6 +64,9 @@
             font-weight: bold;
         }
     </style>
+    <!-- Add Firebase SDK -->
+    
+ 
 </head>
 <body>
 
@@ -91,12 +94,13 @@
 
             <label for="name">Select your name:</label>
             <select id="name" required>
-                <option value="Aruna">Aruna</option>
-                <option value="Dakshitha">Dakshitha</option>
-                <option value="Mani">Mani</option>
-                <option value="Renuka">Renuka</option>
-                <option value="Satya">Satya</option>
-                <option value="Tarun">Tarun</option>
+                <option value="Aruna">John</option>
+                <option value="Dakshitha">Jane</option>
+                <option value="Mani">Mike</option>
+                <option value="Renuka">Emily</option>
+                <option value="Satya">Alice</option>
+                <option value="Tarun">Alice</option>
+                <!-- Add more team member names here -->
             </select>
 
             <button type="submit">Assign VM</button>
@@ -110,16 +114,17 @@
     </div>
 
     <script type="module">
-        // Import Firebase modular SDK
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-        import { getFirestore, getDocs, collection, setDoc, doc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+        // Import Firebase SDK modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
     
         // Your Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyD3IPcwDraVNpkyp3hsdOEaj9sppImKkww",
             authDomain: "automation-4d6c3.firebaseapp.com",
+            databaseURL: "https://automation-4d6c3-default-rtdb.firebaseio.com",
             projectId: "automation-4d6c3",
-            storageBucket: "automation-4d6c3.appspot.com",
+            storageBucket: "automation-4d6c3.firebasestorage.app",
             messagingSenderId: "1004472798000",
             appId: "1:1004472798000:web:9e07bbdef81cb8414856f5",
             measurementId: "G-P68MCKEZWP"
@@ -154,6 +159,7 @@
                         defaultVMStatus[vmName] = vmInfo;
                     });
                 } else {
+                    // Ensure default VM status for any missing data
                     Object.keys(defaultVMStatus).forEach(vm => {
                         if (!defaultVMStatus[vm]) {
                             defaultVMStatus[vm] = { status: "Free", user: "" };
@@ -165,45 +171,45 @@
                 console.error("Error fetching VM status:", error);
             }
         }
-
+    
         // Generate VM list in the DOM
         function updateVMList() {
             const vmListContainer = document.querySelector('.vm-list');
             vmListContainer.innerHTML = ''; // Clear the current list
-
+    
             Object.keys(defaultVMStatus).forEach(vm => {
                 const vmElement = document.createElement('div');
                 const vmData = defaultVMStatus[vm];
-
+    
                 vmElement.classList.add('vm-item');
                 if (vmData.status === "Free") {
                     vmElement.classList.add('free');
                 } else {
                     vmElement.classList.add('in-use');
                 }
-
+    
                 vmElement.innerHTML = `
                     <strong>${vm}</strong>: 
                     <span class="status">${vmData.status}</span>
                     ${vmData.status === 'In Use' ? `by <strong>${vmData.user}</strong>` : ''}
                 `;
-
+    
                 vmListContainer.appendChild(vmElement);
             });
         }
-
+    
         // Handle VM form submission (Assign VM)
         document.getElementById("vmForm").addEventListener("submit", async function(e) {
             e.preventDefault();
-
+    
             const selectedVM = document.getElementById("vm").value;
             const selectedUser = document.getElementById("name").value.trim();
-
+    
             if (selectedUser === "") {
                 alert("Please select your name!");
                 return;
             }
-
+    
             // Check if VM is free
             if (defaultVMStatus[selectedVM].status === "Free") {
                 try {
@@ -218,21 +224,21 @@
             } else {
                 alert(`${selectedVM} is already in use by ${defaultVMStatus[selectedVM].user}.`);
             }
-
+    
             updateVMList();  // Update the UI after assignment
             document.getElementById("vmForm").reset(); // Reset the form
         });
-
+    
         // Handle VM release
         document.getElementById("releaseBtn").addEventListener("click", async function() {
             const selectedVM = document.getElementById("vm").value;
             const selectedUser = document.getElementById("name").value.trim();
-
+    
             if (selectedUser === "") {
                 alert("Please select your name!");
                 return;
             }
-
+    
             if (defaultVMStatus[selectedVM].status === "In Use" && defaultVMStatus[selectedVM].user === selectedUser) {
                 try {
                     // Release VM
@@ -246,14 +252,15 @@
             } else {
                 alert(`You cannot release ${selectedVM} because it is not assigned to you.`);
             }
-
+    
             updateVMList();  // Update the UI after release
             document.getElementById("vmForm").reset(); // Reset the form
         });
-
+    
         // Fetch the initial VM status
         fetchVMStatus();
     </script>
+    
 
 </body>
 </html>
