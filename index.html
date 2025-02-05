@@ -136,12 +136,21 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         // Clear the previous data
-        const defaultVMStatus = {};
-        // Initialize VM data structure
-        const defaultVMStatus = {
+        const oldVMStatus = {
+            "VM1": { status: "In Use", user: "Aruna" },
+            "VM2": { status: "In Use", user: "Dakshitha" },
+            "VM6": { status: "In Use", user: "Tarun" },
+            "VM7": { status: "Free", user: "" },
+            "VM8": { status: "In Use", user: "Tarun" },
+            "VM9": { status: "Free", user: "" },
+            "VM10": { status: "Free", user: "" }
+        };
+        
+        // New VM data (VM3 - VM158)
+        const newVMStatus = {
             "VM3": { status: "Free", user: "" },
-            "VM4": { status: "Free", user: "" },
-            "VM5": { status: "Free", user: "" },
+            "VM4": { status: "In Use", user: "Tarun" },
+            "VM5": { status: "In Use", user: "Dakshitha" },
             "VM59": { status: "Free", user: "" },
             "VM60": { status: "Free", user: "" },
             "VM61": { status: "Free", user: "" },
@@ -150,6 +159,12 @@
             "VM145": { status: "Free", user: "" },
             "VM158": { status: "Free", user: "" }
         };
+        
+        // Combine both old and new VM status
+        const combinedVMStatus = { ...oldVMStatus, ...newVMStatus };
+        
+        // Output the combined VM status
+        console.log(combinedVMStatus);
     
         // Fetch the VM status from Firestore
         async function fetchVMStatus() {
