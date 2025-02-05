@@ -64,7 +64,54 @@
             font-weight: bold;
         }
     </style>
-    <!-- Add Firebase SDK -->
+</head>
+<body>
+
+    <header>
+        <h1>VM Tracker</h1>
+        <p>By Automation Team</p>
+    </header>
+
+    <div class="container">
+        <h2>Assign or Release a VM</h2>
+        <form id="vmForm">
+            <label for="vm">Select a VM:</label>
+            <select id="vm" required>
+                <option value="" disabled selected>Select VM from dropdown</option>
+                <option value="VM3">VM 3</option>
+                <option value="VM4">VM 4</option>
+                <option value="VM5">VM 5</option>
+                <option value="VM59">VM 59</option>
+                <option value="VM60">VM 60</option>
+                <option value="VM61">VM 61</option>
+                <option value="VM143">VM 143</option>
+                <option value="VM144">VM 144</option>
+                <option value="VM145">VM 145</option>
+                <option value="VM158">VM 158</option>
+            </select>
+
+            <label for="name">Select your name:</label>
+            <select id="name" required>
+                <option value="" disabled selected>Select name from dropdown</option>
+                <option value="Aruna">Aruna</option>
+                <option value="Dakshitha">Dakshitha</option>
+                <option value="Mani">Mani</option>
+                <option value="Renuka">Renuka</option>
+                <option value="Satya">Satya</option>
+                <option value="Tarun">Tarun</option>
+            </select>
+
+            <button type="submit">Assign VM</button>
+            <button type="button" id="releaseBtn">Release VM</button>
+        </form>
+
+        <h2>VM Status</h2>
+        <div class="vm-list">
+            <!-- VM items dynamically generated here -->
+        </div>
+    </div>
+
+    <!-- Add Firebase SDK and JS at the bottom of the body -->
     <script type="module">
         // Import Firebase SDK modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
@@ -208,52 +255,6 @@
         // Fetch the initial VM status
         fetchVMStatus();
     </script>
-</head>
-<body>
-
-    <header>
-        <h1>VM Tracker</h1>
-        <p>By Automation Team</p>
-    </header>
-
-    <div class="container">
-        <h2>Assign or Release a VM</h2>
-        <form id="vmForm">
-            <label for="vm">Select a VM:</label>
-            <select id="vm" required>
-                <option value="" disabled selected>Select VM from dropdown</option>
-                <option value="VM3">VM3</option>
-                <option value="VM4">VM4</option>
-                <option value="VM5">VM5</option>
-                <option value="VM59">VM59</option>
-                <option value="VM60">VM60</option>
-                <option value="VM61">VM61</option>
-                <option value="VM143">VM143</option>
-                <option value="VM144">VM144</option>
-                <option value="VM145">VM145</option>
-                <option value="VM158">VM158</option>
-            </select>
-
-            <label for="name">Select your name:</label>
-            <select id="name" required>
-                <option value="" disabled selected>Select name from dropdown</option>
-                <option value="Aruna">Aruna</option>
-                <option value="Dakshitha">Dakshitha</option>
-                <option value="Mani">Mani</option>
-                <option value="Renuka">Renuka</option>
-                <option value="Satya">Satya</option>
-                <option value="Tarun">Tarun</option>
-            </select>
-
-            <button type="submit">Assign VM</button>
-            <button type="button" id="releaseBtn">Release VM</button>
-        </form>
-
-        <h2>VM Status</h2>
-        <div class="vm-list">
-            <!-- VM items dynamically generated here -->
-        </div>
-    </div>
 
 </body>
 </html>
