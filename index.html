@@ -135,7 +135,8 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-    
+        // Clear the previous data
+        defaultVMStatus = {};
         // Initialize VM data structure
         const defaultVMStatus = {
             "VM3": { status: "Free", user: "" },
