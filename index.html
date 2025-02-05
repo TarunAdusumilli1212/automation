@@ -81,16 +81,16 @@
             <label for="vm">Select a VM:</label>
             <select id="vm" required>
                 <option value="" disabled selected>Select VM from dropdown</option>
-                <option value="VM1">VM1: 3</option>
-                <option value="VM2">VM2: 4</option>
-                <option value="VM3">VM3: 5</option>
-                <option value="VM4">VM4: 59</option>
-                <option value="VM5">VM5: 60</option>
-                <option value="VM6">VM6: 61</option>
-                <option value="VM7">VM7: 143</option>
-                <option value="VM8">VM8: 144</option>
-                <option value="VM9">VM9: 145</option>
-                <option value="VM10">VM10: 158</option>
+                <option value="VM1">VM13</option>
+                <option value="VM2">VM4</option>
+                <option value="VM3">VM5</option>
+                <option value="VM4">VM59</option>
+                <option value="VM5">VM60</option>
+                <option value="VM6">VM61</option>
+                <option value="VM7">VM143</option>
+                <option value="VM8">VM144</option>
+                <option value="VM9">VM145</option>
+                <option value="VM10">VM1158</option>
             </select>
 
             <label for="name">Select your name:</label>
@@ -138,8 +138,8 @@
     
         // Initialize VM data structure
         const defaultVMStatus = {
-            "VM1": { status: "Free", user: "" },
-            "VM2": { status: "Free", user: "" },
+            "VM4": { status: "Free", user: "" },
+            "VM5": { status: "Free", user: "" },
             "VM3": { status: "Free", user: "" },
             "VM4": { status: "Free", user: "" },
             "VM5": { status: "Free", user: "" },
@@ -147,7 +147,7 @@
             "VM7": { status: "Free", user: "" },
             "VM8": { status: "Free", user: "" },
             "VM9": { status: "Free", user: "" },
-            "VM10": { status: "Free", user: "" }
+            "VM158": { status: "Free", user: "" }
         };
     
         // Fetch the VM status from Firestore
