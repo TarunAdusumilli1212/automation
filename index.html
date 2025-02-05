@@ -64,9 +64,6 @@
             font-weight: bold;
         }
     </style>
-    <!-- Add Firebase SDK -->
-    
- 
 </head>
 <body>
 
@@ -102,7 +99,6 @@
                 <option value="Renuka">Renuka</option>
                 <option value="Satya">Satya</option>
                 <option value="Tarun">Tarun</option>
-                <!-- Add more team member names here -->
             </select>
 
             <button type="submit">Assign VM</button>
@@ -120,7 +116,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
     
-        // Your Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyD3IPcwDraVNpkyp3hsdOEaj9sppImKkww",
             authDomain: "automation-4d6c3.firebaseapp.com",
@@ -135,38 +131,22 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        // Clear the previous data
-        const oldVMStatus = {
-            "VM1": { status: "In Use", user: "Aruna" },
-            "VM2": { status: "In Use", user: "Dakshitha" },
-            "VM6": { status: "In Use", user: "Tarun" },
-            "VM7": { status: "Free", user: "" },
-            "VM8": { status: "In Use", user: "Tarun" },
-            "VM9": { status: "Free", user: "" },
-            "VM10": { status: "Free", user: "" }
-        };
-        
-        // New VM data (VM3 - VM158)
-        const newVMStatus = {
+    
+        // Default VM status (can be fetched from Firestore)
+        const defaultVMStatus = {
             "VM3": { status: "Free", user: "" },
-            "VM4": { status: "In Use", user: "Tarun" },
-            "VM5": { status: "In Use", user: "Dakshitha" },
-            "VM59": { status: "Free", user: "" },
-            "VM60": { status: "Free", user: "" },
-            "VM61": { status: "Free", user: "" },
+            "VM4": { status: "Free", user: "" },
+            "VM5": { status: "Free", user: "" },
+            "VM59": { status: "Free", user: "" }
+            "VM60": { status: "Free", user: "" }
+            "VM61": { status: "Free", user: "" }
             "VM143": { status: "Free", user: "" },
             "VM144": { status: "Free", user: "" },
             "VM145": { status: "Free", user: "" },
             "VM158": { status: "Free", user: "" }
         };
         
-        // Combine both old and new VM status
-        const combinedVMStatus = { ...oldVMStatus, ...newVMStatus };
-        
-        // Output the combined VM status
-        console.log(combinedVMStatus);
-    
-        // Fetch the VM status from Firestore
+        // Fetch VM status from Firestore
         async function fetchVMStatus() {
             try {
                 const vmData = await getDocs(collection(db, "vmStatus"));
@@ -176,13 +156,6 @@
                         const vmInfo = doc.data();
                         defaultVMStatus[vmName] = vmInfo;
                     });
-                } else {
-                    // Ensure default VM status for any missing data
-                    Object.keys(defaultVMStatus).forEach(vm => {
-                        if (!defaultVMStatus[vm]) {
-                            defaultVMStatus[vm] = { status: "Free", user: "" };
-                        }
-                    });
                 }
                 updateVMList();
             } catch (error) {
@@ -190,7 +163,7 @@
             }
         }
     
-        // Generate VM list in the DOM
+        // Update VM list UI
         function updateVMList() {
             const vmListContainer = document.querySelector('.vm-list');
             vmListContainer.innerHTML = ''; // Clear the current list
@@ -216,7 +189,7 @@
             });
         }
     
-        // Handle VM form submission (Assign VM)
+        // Handle VM assignment
         document.getElementById("vmForm").addEventListener("submit", async function(e) {
             e.preventDefault();
     
@@ -243,8 +216,8 @@
                 alert(`${selectedVM} is already in use by ${defaultVMStatus[selectedVM].user}.`);
             }
     
-            updateVMList();  // Update the UI after assignment
-            document.getElementById("vmForm").reset(); // Reset the form
+            updateVMList();
+            document.getElementById("vmForm").reset();
         });
     
         // Handle VM release
@@ -271,14 +244,13 @@
                 alert(`You cannot release ${selectedVM} because it is not assigned to you.`);
             }
     
-            updateVMList();  // Update the UI after release
-            document.getElementById("vmForm").reset(); // Reset the form
+            updateVMList();
+            document.getElementById("vmForm").reset();
         });
     
         // Fetch the initial VM status
         fetchVMStatus();
     </script>
-    
 
 </body>
 </html>
