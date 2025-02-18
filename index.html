@@ -40,6 +40,10 @@
         .vm-item.in-use {
             background-color: #ffccbc;
         }
+        .vm-item.not-working {
+            background-color: black;
+            color: white;
+        }
         label {
             display: block;
             margin-bottom: 10px;
@@ -100,10 +104,19 @@
                 <option value="Satya">Satya</option>
                 <option value="Tarun">Tarun</option>
             </select>
-
-            <button type="submit">Assign VM</button>
-            <button type="button" id="releaseBtn">Release VM</button>
+            <table style="width:100%">
+                <tr>
+                  <td><button type="submit">Assign VM</button></td>
+                  <td><button type="button" id="releaseBtn">Release VM</button></td>
+                </tr>
+                  <tr>
+                  <td><button type="button" id="markWorkingBtn">Mark as Working</button></td>
+                  <td><button type="button" id="markNotWorkingBtn">Mark as Not Working</button></td>
+                </tr>
+            </table>
         </form>
+        
+   
 
         <h2>VM Status</h2>
         <div class="vm-list">
@@ -111,13 +124,11 @@
         </div>
     </div>
 
-    <!-- Add Firebase SDK and JS at the bottom of the body -->
     <script type="module">
-        // Import Firebase SDK modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
     
-        // Your Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyD3IPcwDraVNpkyp3hsdOEaj9sppImKkww",
             authDomain: "automation-4d6c3.firebaseapp.com",
@@ -133,24 +144,24 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Default VM status with the new VMs (VM3 - VM158)
+        // Default VM status
         const defaultVMStatus = {
-            "VM3": { status: "Free", user: "" },
-            "VM4": { status: "Free", user: "" },
-            "VM5": { status: "Free", user: "" },
-            "VM59": { status: "Free", user: "" },
-            "VM60": { status: "Free", user: "" },
-            "VM61": { status: "Free", user: "" },
-            "VM143": { status: "Free", user: "" },
-            "VM144": { status: "Free", user: "" },
-            "VM145": { status: "Free", user: "" },
-            "VM158": { status: "Free", user: "" }
+            "VM3": { status: "Free", user: "", working: true },
+            "VM4": { status: "Free", user: "", working: true },
+            "VM5": { status: "Free", user: "", working: true },
+            "VM59": { status: "Free", user: "", working: true },
+            "VM60": { status: "Free", user: "", working: true },
+            "VM61": { status: "Free", user: "", working: true },
+            "VM143": { status: "Free", user: "", working: true },
+            "VM144": { status: "Free", user: "", working: true },
+            "VM145": { status: "Free", user: "", working: true },
+            "VM158": { status: "Free", user: "", working: true }
         };
 
-        // Update VM list dynamically in the DOM
+        // Update VM list dynamically
         function updateVMList() {
             const vmListContainer = document.querySelector('.vm-list');
-            vmListContainer.innerHTML = ''; // Clear the current list
+            vmListContainer.innerHTML = ''; // Clear current list
 
             Object.keys(defaultVMStatus).forEach(vm => {
                 const vmElement = document.createElement('div');
@@ -163,9 +174,14 @@
                     vmElement.classList.add('in-use');
                 }
 
+                if (!vmData.working) {
+                    vmElement.classList.add('not-working');
+                }
+
                 vmElement.innerHTML = `
                     <strong>${vm}</strong>: 
-                    <span class="status">${vmData.status}</span>
+                    <span class="status">${vmData.status}</span><br>
+                    Working: <span class="status">${vmData.working ? "Yes" : "No"}</span><br>
                     ${vmData.status === 'In Use' ? `by <strong>${vmData.user}</strong>` : ''}
                 `;
 
@@ -173,7 +189,7 @@
             });
         }
 
-        // Fetch the VM status from Firestore
+        // Fetch VM status from Firestore
         async function fetchVMStatus() {
             try {
                 const vmData = await getDocs(collection(db, "vmStatus"));
@@ -181,80 +197,79 @@
                     vmData.forEach(doc => {
                         const vmName = doc.id;
                         const vmInfo = doc.data();
-                        // Update the defaultVMStatus with the Firestore data
+                        // Update the defaultVMStatus with Firestore data
                         if (defaultVMStatus[vmName]) {
                             defaultVMStatus[vmName] = vmInfo;
                         }
                     });
                 }
-                updateVMList(); // Update the list after fetching data
+                updateVMList(); // Update list after fetching data
             } catch (error) {
                 console.error("Error fetching VM status:", error);
             }
         }
 
-        // Handle VM form submission (Assign VM)
-        document.getElementById("vmForm").addEventListener("submit", async function(e) {
-            e.preventDefault();
-
+        // Mark VM as Working
+        document.getElementById("markWorkingBtn").addEventListener("click", async function() {
             const selectedVM = document.getElementById("vm").value;
-            const selectedUser = document.getElementById("name").value.trim();
 
-            if (selectedUser === "") {
-                alert("Please select your name!");
-                return;
-            }
+            if (selectedVM && defaultVMStatus[selectedVM]) {
+                if (defaultVMStatus[selectedVM].working === true) {
+                    alert(`${selectedVM} is already marked as Working.`);
+                    return; // Prevent further action if it's already working
+                }
 
-            // Check if VM is free
-            if (defaultVMStatus[selectedVM].status === "Free") {
                 try {
-                    // Assign VM to the user
-                    defaultVMStatus[selectedVM] = { status: "In Use", user: selectedUser };
-                    await setDoc(doc(db, "vmStatus", selectedVM), { status: "In Use", user: selectedUser });
-                    alert(`${selectedUser} has successfully assigned ${selectedVM}`);
+                    // Mark VM as working
+                    defaultVMStatus[selectedVM].working = true;
+                    await setDoc(doc(db, "vmStatus", selectedVM), { 
+                        ...defaultVMStatus[selectedVM], 
+                        working: true 
+                    });
+
+                    alert(`${selectedVM} is now marked as Working.`);
+                    updateVMList(); // Update list after marking as working
                 } catch (error) {
-                    console.error(`Error assigning ${selectedVM}:`, error);
-                    alert(`Error assigning ${selectedVM}. Please try again.`);
+                    console.error(`Error marking ${selectedVM} as Working:`, error);
+                    alert(`Error marking ${selectedVM} as Working. Please try again.`);
                 }
             } else {
-                alert(`${selectedVM} is already in use by ${defaultVMStatus[selectedVM].user}.`);
+                alert("Please select a valid VM.");
             }
-
-            updateVMList();  // Update the UI after assignment
-            document.getElementById("vmForm").reset(); // Reset the form
         });
 
-        // Handle VM release
-        document.getElementById("releaseBtn").addEventListener("click", async function() {
+        // Mark VM as Not Working
+        document.getElementById("markNotWorkingBtn").addEventListener("click", async function() {
             const selectedVM = document.getElementById("vm").value;
-            const selectedUser = document.getElementById("name").value.trim();
 
-            if (selectedUser === "") {
-                alert("Please select your name!");
-                return;
-            }
+            if (selectedVM && defaultVMStatus[selectedVM]) {
+                if (defaultVMStatus[selectedVM].working === false) {
+                    alert(`${selectedVM} is already marked as Not Working.`);
+                    return; // Prevent further action if it's already not working
+                }
 
-            if (defaultVMStatus[selectedVM].status === "In Use" && defaultVMStatus[selectedVM].user === selectedUser) {
                 try {
-                    // Release VM
-                    defaultVMStatus[selectedVM] = { status: "Free", user: "" };
-                    await setDoc(doc(db, "vmStatus", selectedVM), { status: "Free", user: "" });
-                    alert(`${selectedUser} has successfully released ${selectedVM}`);
+                    // Mark VM as not working
+                    defaultVMStatus[selectedVM].working = false;
+                    await setDoc(doc(db, "vmStatus", selectedVM), { 
+                        ...defaultVMStatus[selectedVM], 
+                        working: false 
+                    });
+
+                    alert(`${selectedVM} is now marked as Not Working.`);
+                    updateVMList(); // Update list after marking as not working
                 } catch (error) {
-                    console.error(`Error releasing ${selectedVM}:`, error);
-                    alert(`Error releasing ${selectedVM}. Please try again.`);
+                    console.error(`Error marking ${selectedVM} as Not Working:`, error);
+                    alert(`Error marking ${selectedVM} as Not Working. Please try again.`);
                 }
             } else {
-                alert(`You cannot release ${selectedVM} because it is not assigned to you.`);
+                alert("Please select a valid VM.");
             }
-
-            updateVMList();  // Update the UI after release
-            document.getElementById("vmForm").reset(); // Reset the form
         });
 
-        // Fetch the initial VM status
+        // Fetch initial VM status when the page loads
         fetchVMStatus();
-    </script>
 
+    </script>
 </body>
 </html>
