@@ -11,16 +11,33 @@
             padding: 0;
             background-color: #f4f4f4;
         }
+
         header {
-            background-color: #333;
+            background-image: url("https://tse4.mm.bing.net/th/id/OIP.79TNq6F2HT0FT4R7totPhQAAAA?rs=1&pid=ImgDetMain");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
             color: #fff;
             padding: 20px;
             text-align: center;
         }
+
+        header h1 {
+            font-size: 2.5em;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        header p {
+            font-size: 1.2em;
+            font-style: italic;
+        }
+
         .container {
             width: 80%;
             margin: 20px auto;
         }
+
         .vm-list {
             margin: 20px 0;
             padding: 10px;
@@ -28,27 +45,33 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         .vm-item {
             margin: 10px 0;
             padding: 10px;
             background-color: #e7e7e7;
             border-radius: 5px;
         }
+
         .vm-item.free {
             background-color: #c8e6c9;
         }
+
         .vm-item.in-use {
             background-color: #ffccbc;
         }
+
         .vm-item.not-working {
             background-color: black;
             color: white;
         }
+
         label {
             display: block;
             margin-bottom: 10px;
             font-weight: bold;
         }
+
         select, button {
             width: 100%;
             padding: 10px;
@@ -56,14 +79,17 @@
             border-radius: 5px;
             border: 1px solid #ccc;
         }
+
         button {
             background-color: #4CAF50;
             color: white;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
         .status {
             font-weight: bold;
         }
@@ -71,205 +97,244 @@
 </head>
 <body>
 
-    <header>
-        <h1>VM Tracker</h1>
-        <p>By Automation Team</p>
-    </header>
+<header>
+    <h1>VM Tracker</h1>
+    <p>Track which team member is using which VM</p>
+</header>
 
-    <div class="container">
-        <h2>Assign or Release a VM</h2>
-        <form id="vmForm">
-            <label for="vm">Select a VM:</label>
-            <select id="vm" required>
-                <option value="" disabled selected>Select VM from dropdown</option>
-                <option value="VM3">VM3</option>
-                <option value="VM4">VM4</option>
-                <option value="VM5">VM5</option>
-                <option value="VM59">VM59</option>
-                <option value="VM60">VM60</option>
-                <option value="VM61">VM61</option>
-                <option value="VM143">VM143</option>
-                <option value="VM144">VM144</option>
-                <option value="VM145">VM145</option>
-                <option value="VM158">VM158</option>
-            </select>
+<div class="container">
+    <h2>Assign or Release a VM</h2>
+    <form id="vmForm">
+        <label for="vm">Select a VM:</label>
+        <select id="vm" required>
+            <option value="" disabled selected>Select VM from dropdown</option>
+            <option value="VM3">VM3</option>
+            <option value="VM4">VM4</option>
+            <option value="VM5">VM5</option>
+            <option value="VM59">VM59</option>
+            <option value="VM60">VM60</option>
+            <option value="VM61">VM61</option>
+            <option value="VM143">VM143</option>
+            <option value="VM144">VM144</option>
+            <option value="VM145">VM145</option>
+            <option value="VM158">VM158</option>
+        </select>
 
-            <label for="name">Select your name:</label>
-            <select id="name" required>
-                <option value="" disabled selected>Select name from dropdown</option>
-                <option value="Aruna">Aruna</option>
-                <option value="Dakshitha">Dakshitha</option>
-                <option value="Mani">Mani</option>
-                <option value="Renuka">Renuka</option>
-                <option value="Satya">Satya</option>
-                <option value="Tarun">Tarun</option>
-            </select>
-            <table style="width:100%">
-                <tr>
-                  <td><button type="submit">Assign VM</button></td>
-                  <td><button type="button" id="releaseBtn">Release VM</button></td>
-                </tr>
-                  <tr>
-                  <td><button type="button" id="markWorkingBtn">Mark as Working</button></td>
-                  <td><button type="button" id="markNotWorkingBtn">Mark as Not Working</button></td>
-                </tr>
-            </table>
-        </form>
-        
-   
+        <label for="name">Select your name:</label>
+        <select id="name" required>
+            <option value="" disabled selected>Select name from dropdown</option>
+            <option value="Aruna">Aruna</option>
+            <option value="Dakshitha">Dakshitha</option>
+            <option value="Mani">Mani</option>
+            <option value="Renuka">Renuka</option>
+            <option value="Satya">Satya</option>
+            <option value="Tarun">Tarun</option>
+        </select>
+        <table style="width:100%">
+            <tr>
+                <td><button type="submit">Assign VM</button></td>
+                <td><button type="button" id="releaseBtn">Release VM</button></td>
+            </tr>
+            <tr>
+                <td><button type="button" id="markWorkingBtn">Mark as Working</button></td>
+                <td><button type="button" id="markNotWorkingBtn">Mark as Not Working</button></td>
+            </tr>
+        </table>
+    </form>
 
-        <h2>VM Status</h2>
-        <div class="vm-list">
-            <!-- VM items dynamically generated here -->
-        </div>
+    <h2>VM Status</h2>
+    <div class="vm-list">
+        <!-- VM items dynamically generated here -->
     </div>
+</div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
-    
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyD3IPcwDraVNpkyp3hsdOEaj9sppImKkww",
-            authDomain: "automation-4d6c3.firebaseapp.com",
-            databaseURL: "https://automation-4d6c3-default-rtdb.firebaseio.com",
-            projectId: "automation-4d6c3",
-            storageBucket: "automation-4d6c3.firebasestorage.app",
-            messagingSenderId: "1004472798000",
-            appId: "1:1004472798000:web:9e07bbdef81cb8414856f5",
-            measurementId: "G-P68MCKEZWP"
-        };
-    
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
-        // Default VM status
-        const defaultVMStatus = {
-            "VM3": { status: "Free", user: "", working: true },
-            "VM4": { status: "Free", user: "", working: true },
-            "VM5": { status: "Free", user: "", working: true },
-            "VM59": { status: "Free", user: "", working: true },
-            "VM60": { status: "Free", user: "", working: true },
-            "VM61": { status: "Free", user: "", working: true },
-            "VM143": { status: "Free", user: "", working: true },
-            "VM144": { status: "Free", user: "", working: true },
-            "VM145": { status: "Free", user: "", working: true },
-            "VM158": { status: "Free", user: "", working: true }
-        };
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyD3IPcwDraVNpkyp3hsdOEaj9sppImKkww",
+        authDomain: "automation-4d6c3.firebaseapp.com",
+        databaseURL: "https://automation-4d6c3-default-rtdb.firebaseio.com",
+        projectId: "automation-4d6c3",
+        storageBucket: "automation-4d6c3.firebasestorage.app",
+        messagingSenderId: "1004472798000",
+        appId: "1:1004472798000:web:9e07bbdef81cb8414856f5",
+        measurementId: "G-P68MCKEZWP"
+    };
 
-        // Update VM list dynamically
-        function updateVMList() {
-            const vmListContainer = document.querySelector('.vm-list');
-            vmListContainer.innerHTML = ''; // Clear current list
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-            Object.keys(defaultVMStatus).forEach(vm => {
-                const vmElement = document.createElement('div');
-                const vmData = defaultVMStatus[vm];
+    // Default VM status
+    const defaultVMStatus = {
+        "VM3": { status: "Free", user: "", working: true },
+        "VM4": { status: "Free", user: "", working: true },
+        "VM5": { status: "Free", user: "", working: true },
+        "VM59": { status: "Free", user: "", working: true },
+        "VM60": { status: "Free", user: "", working: true },
+        "VM61": { status: "Free", user: "", working: true },
+        "VM143": { status: "Free", user: "", working: true },
+        "VM144": { status: "Free", user: "", working: true },
+        "VM145": { status: "Free", user: "", working: true },
+        "VM158": { status: "Free", user: "", working: true }
+    };
 
-                vmElement.classList.add('vm-item');
-                if (vmData.status === "Free") {
-                    vmElement.classList.add('free');
-                } else {
-                    vmElement.classList.add('in-use');
-                }
+    // Update VM list dynamically
+    function updateVMList() {
+        const vmListContainer = document.querySelector('.vm-list');
+        vmListContainer.innerHTML = ''; // Clear current list
 
-                if (!vmData.working) {
-                    vmElement.classList.add('not-working');
-                }
+        Object.keys(defaultVMStatus).forEach(vm => {
+            const vmElement = document.createElement('div');
+            const vmData = defaultVMStatus[vm];
 
-                vmElement.innerHTML = `
-                    <strong>${vm}</strong>: 
-                    <span class="status">${vmData.status}</span><br>
-                    Working: <span class="status">${vmData.working ? "Yes" : "No"}</span><br>
-                    ${vmData.status === 'In Use' ? `by <strong>${vmData.user}</strong>` : ''}
-                `;
+            vmElement.classList.add('vm-item');
+            if (vmData.status === "Free") {
+                vmElement.classList.add('free');
+            } else {
+                vmElement.classList.add('in-use');
+            }
 
-                vmListContainer.appendChild(vmElement);
-            });
+            if (!vmData.working) {
+                vmElement.classList.add('not-working');
+            }
+
+            vmElement.innerHTML =
+                `<strong>${vm}</strong>: 
+                <span class="status">${vmData.status}</span><br>
+                Working: <span class="status">${vmData.working ? "Yes" : "No"}</span><br>
+                ${vmData.status === 'In Use' ? `by <strong>${vmData.user}</strong>` : ''}`;
+
+            vmListContainer.appendChild(vmElement);
+        });
+    }
+
+    // Fetch VM status from Firestore
+    async function fetchVMStatus() {
+        try {
+            const vmData = await getDocs(collection(db, "vmStatus"));
+            if (!vmData.empty) {
+                vmData.forEach(doc => {
+                    const vmName = doc.id;
+                    const vmInfo = doc.data();
+                    // Update the defaultVMStatus with Firestore data
+                    if (defaultVMStatus[vmName]) {
+                        defaultVMStatus[vmName] = vmInfo;
+                    }
+                });
+            }
+            updateVMList(); // Update list after fetching data
+        } catch (error) {
+            console.error("Error fetching VM status:", error);
+        }
+    }
+
+    // Handle VM form submission (Assign VM)
+    document.getElementById("vmForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+        const selectedVM = document.getElementById("vm").value;
+        const selectedUser = document.getElementById("name").value.trim();
+        
+        if (selectedUser === "") {
+            alert("Please select your name!");
+            return;
         }
 
-        // Fetch VM status from Firestore
-        async function fetchVMStatus() {
+        // Check if VM is free and working
+        if (defaultVMStatus[selectedVM].status === "Free" && defaultVMStatus[selectedVM].working) {
             try {
-                const vmData = await getDocs(collection(db, "vmStatus"));
-                if (!vmData.empty) {
-                    vmData.forEach(doc => {
-                        const vmName = doc.id;
-                        const vmInfo = doc.data();
-                        // Update the defaultVMStatus with Firestore data
-                        if (defaultVMStatus[vmName]) {
-                            defaultVMStatus[vmName] = vmInfo;
-                        }
-                    });
-                }
-                updateVMList(); // Update list after fetching data
+                // Assign VM to the user
+                defaultVMStatus[selectedVM] = { status: "In Use", user: selectedUser, working: true };
+                await setDoc(doc(db, "vmStatus", selectedVM), { status: "In Use", user: selectedUser, working: true });
+                alert(`${selectedUser} has successfully assigned ${selectedVM}`);
             } catch (error) {
-                console.error("Error fetching VM status:", error);
+                console.error(`Error assigning ${selectedVM}:`, error);
+                alert(`Error assigning ${selectedVM}. Please try again.`);
             }
+        } else if (!defaultVMStatus[selectedVM].working) {
+            alert(`${selectedVM} is marked as Not Working. Please select a different VM.`);
+        } else {
+            alert(`${selectedVM} is already in use by ${defaultVMStatus[selectedVM].user}.`);
+        }
+        updateVMList();  // Update the UI after assignment
+        document.getElementById("vmForm").reset(); // Reset the form
+    });
+
+    // Handle VM release
+    document.getElementById("releaseBtn").addEventListener("click", async function() {
+        const selectedVM = document.getElementById("vm").value;
+        const selectedUser = document.getElementById("name").value.trim();
+        
+        if (selectedUser === "") {
+            alert("Please select your name!");
+            return;
         }
 
-        // Mark VM as Working
-        document.getElementById("markWorkingBtn").addEventListener("click", async function() {
-            const selectedVM = document.getElementById("vm").value;
-
-            if (selectedVM && defaultVMStatus[selectedVM]) {
-                if (defaultVMStatus[selectedVM].working === true) {
-                    alert(`${selectedVM} is already marked as Working.`);
-                    return; // Prevent further action if it's already working
-                }
-
-                try {
-                    // Mark VM as working
-                    defaultVMStatus[selectedVM].working = true;
-                    await setDoc(doc(db, "vmStatus", selectedVM), { 
-                        ...defaultVMStatus[selectedVM], 
-                        working: true 
-                    });
-
-                    alert(`${selectedVM} is now marked as Working.`);
-                    updateVMList(); // Update list after marking as working
-                } catch (error) {
-                    console.error(`Error marking ${selectedVM} as Working:`, error);
-                    alert(`Error marking ${selectedVM} as Working. Please try again.`);
-                }
-            } else {
-                alert("Please select a valid VM.");
+        if (defaultVMStatus[selectedVM].status === "In Use" && defaultVMStatus[selectedVM].user === selectedUser) {
+            try {
+                // Release VM
+                defaultVMStatus[selectedVM] = { status: "Free", user: "", working: true };
+                await setDoc(doc(db, "vmStatus", selectedVM), { status: "Free", user: "", working: true });
+                alert(`${selectedUser} has successfully released ${selectedVM}`);
+            } catch (error) {
+                console.error(`Error releasing ${selectedVM}:`, error);
+                alert(`Error releasing ${selectedVM}. Please try again.`);
             }
-        });
+        } else {
+            alert(`${selectedVM} is not assigned to you.`);
+        }
+        updateVMList(); // Update the UI after release
+        document.getElementById("vmForm").reset(); // Reset the form
+    });
 
-        // Mark VM as Not Working
-        document.getElementById("markNotWorkingBtn").addEventListener("click", async function() {
-            const selectedVM = document.getElementById("vm").value;
+    // Mark VM as Working
+    document.getElementById("markWorkingBtn").addEventListener("click", async function() {
+        const selectedVM = document.getElementById("vm").value;
+        
+        if (!selectedVM) {
+            alert("Please select a VM to mark as working.");
+            return;
+        }
 
-            if (selectedVM && defaultVMStatus[selectedVM]) {
-                if (defaultVMStatus[selectedVM].working === false) {
-                    alert(`${selectedVM} is already marked as Not Working.`);
-                    return; // Prevent further action if it's already not working
-                }
+        defaultVMStatus[selectedVM].working = true;
 
-                try {
-                    // Mark VM as not working
-                    defaultVMStatus[selectedVM].working = false;
-                    await setDoc(doc(db, "vmStatus", selectedVM), { 
-                        ...defaultVMStatus[selectedVM], 
-                        working: false 
-                    });
+        try {
+            await setDoc(doc(db, "vmStatus", selectedVM), { ...defaultVMStatus[selectedVM] });
+            alert(`${selectedVM} marked as Working.`);
+            updateVMList(); // Update list after marking
+        } catch (error) {
+            console.error(`Error marking ${selectedVM} as working:`, error);
+            alert(`Error marking ${selectedVM} as working.`);
+        }
+    });
 
-                    alert(`${selectedVM} is now marked as Not Working.`);
-                    updateVMList(); // Update list after marking as not working
-                } catch (error) {
-                    console.error(`Error marking ${selectedVM} as Not Working:`, error);
-                    alert(`Error marking ${selectedVM} as Not Working. Please try again.`);
-                }
-            } else {
-                alert("Please select a valid VM.");
-            }
-        });
+    // Mark VM as Not Working
+    document.getElementById("markNotWorkingBtn").addEventListener("click", async function() {
+        const selectedVM = document.getElementById("vm").value;
 
-        // Fetch initial VM status when the page loads
-        fetchVMStatus();
+        if (!selectedVM) {
+            alert("Please select a VM to mark as Not Working.");
+            return;
+        }
 
-    </script>
+        defaultVMStatus[selectedVM].working = false;
+
+        try {
+            await setDoc(doc(db, "vmStatus", selectedVM), { ...defaultVMStatus[selectedVM] });
+            alert(`${selectedVM} marked as Not Working.`);
+            updateVMList(); // Update list after marking
+        } catch (error) {
+            console.error(`Error marking ${selectedVM} as Not Working:`, error);
+            alert(`Error marking ${selectedVM} as Not Working.`);
+        }
+    });
+
+    // Fetch initial data from Firestore on load
+    fetchVMStatus();
+</script>
+
 </body>
 </html>
